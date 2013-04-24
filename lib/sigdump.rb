@@ -30,10 +30,8 @@ module Sigdump
       status = "error"
     end
 
-    backtrace = thread.backtrace
-
     io.write "  Thread #{thread} status=#{status} priority=#{thread.priority}\n"
-    backtrace.each {|bt|
+    thread.backtrace.each {|bt|
       io.write "      #{bt}\n"
     }
 
