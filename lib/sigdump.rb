@@ -8,6 +8,7 @@ module Sigdump
           io.write "Sigdump at #{Time.now} process #{Process.pid} (#{$0})\n"
           dump_all_thread_backtrace(io)
           dump_object_count(io)
+          dump_gc_profiler_result(io)
         end
       rescue
       end
@@ -72,6 +73,17 @@ module Sigdump
     io.write "    Hash #{_fn(hash_size)} pairs\n"
 
     io.flush
+    nil
+  end
+
+  def self.dump_gc_profiler_result(io)
+    return unless defined?(GC::Profiler) && GC::Profiler.enabled?
+    io.write "  GC profiling result:\n"
+    io.write "  Total garbage collection time: %f\n" % GC::Profiler.total_time
+    GC::Profiler.result.each_line.map do |line|
+      io.write "  #{line}"
+    end
+    GC::Profiler.clear
     nil
   end
 
