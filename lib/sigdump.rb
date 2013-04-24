@@ -78,12 +78,13 @@ module Sigdump
 
   def self.dump_gc_profiler_result(io)
     return unless defined?(GC::Profiler) && GC::Profiler.enabled?
+
     io.write "  GC profiling result:\n"
     io.write "  Total garbage collection time: %f\n" % GC::Profiler.total_time
-    GC::Profiler.result.each_line.each do |line|
-      io.write "  #{line}"
-    end
+    io.write GC::Profiler.result
     GC::Profiler.clear
+
+    io.flush
     nil
   end
 
