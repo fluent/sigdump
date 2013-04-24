@@ -1,4 +1,9 @@
 
+2013-04-24 version 0.1.1:
+
+* Signal handler dumps GC statistics as well if GC::Profiler is enabled
+(by @mrkn / Kenta Murata)
+
 2013-04-23 version 0.1.0:
 
 * First release

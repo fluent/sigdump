@@ -1,5 +1,5 @@
 module Sigdump
-  VERSION = "0.1.0"
+  VERSION = "0.1.1"
 
   def self.install_thread_dump_handler(signal, path=nil)
     Kernel.trap(signal) do
