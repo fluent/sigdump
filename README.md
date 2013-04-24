@@ -4,13 +4,15 @@ Server applications (like Rails app) cause performance problems, deadlock or mem
 
 `sigdump` gem installs a signal handler which dumps backtrace of running threads and number of allocated objects per class.
 
-# Install
+If GC profiler is enabled (`GC::Profiler.enable` is called), it also dumps GC statistics.
+
+## Install
 
 Just install one gem `sigdump` and require `sigdump/setup`:
 
     gem 'sigdump', :require => 'sigdump/setup'
 
-# Usage
+## Usage
 
 Send `SIGCONT` signal to dump backtrace and heap status to `/tmp/sigdump-<pid>.log`:
 
@@ -20,7 +22,7 @@ Set `SIGDUMP_SIGNAL` environment variable to change the signal (default: SIGCONT
 
 Set `SIGDUMP_PATH` environment variable to change the output path (default: /tmp/sigdump-\<pid\>.log). You can set "-" here to dump to STDOUT, "+" to dump to STDERR.
 
-# Sample outout
+## Sample outout
 
     $ cat /tmp/sigdump-9218.log
     Sigdump at 2013-04-24 16:57:12 +0000 process 9218 (unicorn worker[3] -E staging -c /etc/unicorn/staging.rb -E staging)
