@@ -83,6 +83,7 @@ module Sigdump
       s
     end
   end
+  private_class_method :_fn
 
   def self._open_dump_path(path, &block)
     case path
@@ -99,4 +100,5 @@ module Sigdump
       File.open(path, "a", &block)
     end
   end
+  private_class_method :_open_dump_path
 end
