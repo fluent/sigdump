@@ -1,17 +1,21 @@
 module Sigdump
   VERSION = "0.1.1"
 
-  def self.setup(signal, path=nil)
+  def self.setup(signal=ENV['SIGDUMP_SIGNAL'] || 'SIGCONT', path=ENV['SIGDUMP_PATH'])
     Kernel.trap(signal) do
       begin
-        _open_dump_path(path) do |io|
-          io.write "Sigdump at #{Time.now} process #{Process.pid} (#{$0})\n"
-          dump_all_thread_backtrace(io)
-          dump_object_count(io)
-          dump_gc_profiler_result(io)
-        end
+        dump(path)
       rescue
       end
+    end
+  end
+
+  def self.dump(path=ENV['SIGDUMP_PATH'])
+    _open_dump_path(path) do |io|
+      io.write "Sigdump at #{Time.now} process #{Process.pid} (#{$0})\n"
+      dump_all_thread_backtrace(io)
+      dump_object_count(io)
+      dump_gc_profiler_result(io)
     end
   end
 
