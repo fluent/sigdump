@@ -1,7 +1,7 @@
 module Sigdump
   VERSION = "0.1.1"
 
-  def self.install_thread_dump_handler(signal, path=nil)
+  def self.setup(signal, path=nil)
     Kernel.trap(signal) do
       begin
         _open_dump_path(path) do |io|
