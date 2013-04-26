@@ -1,4 +1,9 @@
 
+2013-04-26 version 0.2.0:
+
+* Renamed Sigdump.install_thread_dump_handler to Sigdump.setup
+* Added Sigdump.dump
+
 2013-04-24 version 0.1.1:
 
 * Signal handler dumps GC statistics as well if GC::Profiler is enabled

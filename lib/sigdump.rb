@@ -1,5 +1,5 @@
 module Sigdump
-  VERSION = "0.1.1"
+  VERSION = "0.2.0"
 
   def self.setup(signal=ENV['SIGDUMP_SIGNAL'] || 'SIGCONT', path=ENV['SIGDUMP_PATH'])
     Kernel.trap(signal) do
