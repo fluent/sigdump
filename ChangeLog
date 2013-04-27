@@ -1,4 +1,8 @@
 
+2013-04-27 version 0.2.1:
+
+* Fixed setup.rb
+
 2013-04-26 version 0.2.0:
 
 * Renamed Sigdump.install_thread_dump_handler to Sigdump.setup
