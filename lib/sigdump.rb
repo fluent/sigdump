@@ -108,7 +108,7 @@ module Sigdump
     when IO
       yield path
     when "-"
-      yield STDIN
+      yield STDOUT
     when "+"
       yield STDERR
     else
