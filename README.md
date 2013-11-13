@@ -12,6 +12,16 @@ Just install one gem `sigdump` and require `sigdump/setup`:
 
     gem 'sigdump', :require => 'sigdump/setup'
 
+### Resque
+
+Because Resque traps `SIGCONT`, you need to change the signal to another signal such as TSTP.
+In environment.rb:
+
+```
+ENV['SIGDUMP_SIGNAL'] = 'TSTP'
+require 'sigdump/setup'
+```
+
 ## Usage
 
 Send `SIGCONT` signal to dump backtrace and heap status to `/tmp/sigdump-<pid>.log`:
