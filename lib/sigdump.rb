@@ -14,6 +14,7 @@ module Sigdump
     _open_dump_path(path) do |io|
       io.write "Sigdump at #{Time.now} process #{Process.pid} (#{$0})\n"
       dump_all_thread_backtrace(io)
+      dump_gc_stat(io)
       dump_object_count(io)
       dump_gc_profiler_result(io)
     end
@@ -73,6 +74,17 @@ module Sigdump
     io.write "  String #{_fn(string_size)} bytes\n"
     io.write "   Array #{_fn(array_size)} elements\n"
     io.write "    Hash #{_fn(hash_size)} pairs\n"
+
+    io.flush
+    nil
+  end
+
+  def self.dump_gc_stat(io)
+    io.write "  GC stat:\n"
+
+    GC.stat.each do |key, val|
+      io.write "      #{key}: #{val}\n"
+    end
 
     io.flush
     nil

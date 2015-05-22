@@ -4,9 +4,9 @@ In short: *SIGQUIT of Java VM for Ruby.*
 
 Server applications (like Rails app) cause performance problems, deadlock or memory swapping from time to time. But it's painful to reproduce such kind of problems. If we can get information from a running process without restarting it, it's really helpful.
 
-`sigdump` gem installs a signal handler which dumps backtrace of running threads and number of allocated objects per class.
+`sigdump` gem installs a signal handler which dumps backtrace of running threads, number of allocated objects per class, and GC statistics.
 
-If GC profiler is enabled (`GC::Profiler.enable` is called), it also dumps GC statistics.
+If GC profiler is enabled (`GC::Profiler.enable` is called), it also dumps GC profiler reports.
 
 ## Install
 
@@ -60,6 +60,30 @@ Set `SIGDUMP_PATH` environment variable to change the output path (default: /tmp
           /srv/staging/current/vendor/bundle/ruby/1.9.1/gems/unicorn-4.3.1/bin/unicorn:121:in `<top (required)>'
           /srv/staging/current/vendor/bundle/ruby/1.9.1/bin/unicorn:23:in `load'
           /srv/staging/current/vendor/bundle/ruby/1.9.1/bin/unicorn:23:in `<main>'
+      GC stat:
+          count: 34
+          heap_allocated_pages: 1366
+          heap_sorted_length: 1368
+          heap_allocatable_pages: 0
+          heap_available_slots: 556777
+          heap_live_slots: 551708
+          heap_free_slots: 5069
+          heap_final_slots: 0
+          heap_marked_slots: 363350
+          heap_swept_slots: 58807
+          heap_eden_pages: 1366
+          heap_tomb_pages: 0
+          total_allocated_pages: 1367
+          total_freed_pages: 1
+          total_allocated_objects: 2438499
+          total_freed_objects: 1886791
+          malloc_increase_bytes: 650416
+          malloc_increase_bytes_limit: 16777216
+          minor_gc_count: 25
+          major_gc_count: 9
+          remembered_wb_unprotected_objects: 5122
+          remembered_wb_unprotected_objects_limit: 5222
+          old_objects: 348964
       Built-in objects:
        367,492: TOTAL
        208,193: T_STRING
