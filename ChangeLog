@@ -1,4 +1,8 @@
 
+2015-05-21 version 0.2.3:
+
+* Signal handler shows GC.stat (by @sonots / Naotoshi Seo)
+
 2013-04-27 version 0.2.2:
 
 * Fixed SIGDUMP_PATH=- handling (by @yu74n / Yuta Hongo)
