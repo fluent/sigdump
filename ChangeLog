@@ -1,4 +1,8 @@
 
+2016-02-04 version 0.2.4:
+
+* In JRuby, signal handler shows Java stacktrace in addition to Ruby stacktrace
+
 2015-05-21 version 0.2.3:
 
 * Signal handler shows GC.stat (by @sonots / Naotoshi Seo)
