@@ -4,9 +4,9 @@ In short: *SIGQUIT of Java VM for Ruby.*
 
 Server applications (like Rails app) cause performance problems, deadlock or memory swapping from time to time. But it's painful to reproduce such kind of problems. If we can get information from a running process without restarting it, it's really helpful.
 
-`sigdump` gem installs a signal handler which dumps backtrace of running threads, number of allocated objects per class, and GC statistics.
+`sigdump` gem makes it possible. It installs a signal handler which dumps backtrace of running threads, number of allocated objects per class, and GC statistics.
 
-If GC profiler is enabled (`GC::Profiler.enable` is called), it also dumps GC profiler reports.
+If GC profiler is enabled (`GC::Profiler.enable` is called), it also dumps GC profiler reports. If the runtime is JRuby, it dumpds Java stacktrace in addition to Ruby stacktrace.
 
 ## Install
 
@@ -18,10 +18,11 @@ gem 'sigdump', :require => 'sigdump/setup'
 
 ### Resque
 
-Because Resque traps `SIGCONT`, you need to change the signal to another signal such as TSTP.
-In environment.rb:
+Because Resque traps `SIGCONT` and it conflicts with sigdump, you need to change the signal such as `SIGTSTP`.
+To change the signal, set name of a signal to `SIGDUMP_SIGNAL` environment variable.
 
 ```ruby
+# environment.rb:
 # setup sigdump: https://github.com/frsyuki/sigdump
 ENV['SIGDUMP_SIGNAL'] = 'TSTP'
 require 'sigdump/setup'
@@ -29,10 +30,11 @@ require 'sigdump/setup'
 
 ## Usage
 
-Send `SIGCONT` signal to dump backtrace and heap status to `/tmp/sigdump-<pid>.log`:
+Send `SIGCONT` signal to dump backtrace and heap status to `/tmp/sigdump-<pid>.log` file:
 
 ```shell
 $ kill -CONT <pid>
+$ cat /tmp/sigdump-<pid>.log
 ```
 
 Set `SIGDUMP_SIGNAL` environment variable to change the signal (default: SIGCONT).
