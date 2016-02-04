@@ -21,8 +21,21 @@ module Sigdump
   end
 
   def self.dump_all_thread_backtrace(io)
+    use_java_bean = defined?(Thread.current.to_java.getNativeThread.getId)
+    if use_java_bean
+      begin
+        bean = java.lang.management.ManagementFactory.getThreadMXBean
+        java_stacktrace_map = Hash[bean.getThreadInfo(bean.getAllThreadIds, true, true).map {|t| [t.getThreadId, t.toString] }]
+      rescue
+        # security error may happen
+      end
+    end
     Thread.list.each do |thread|
       dump_backtrace(thread, io)
+      if java_stacktrace_map
+        io.write "    In Java " + java_stacktrace_map[thread.to_java.getNativeThread.getId]
+        io.flush
+      end
     end
     nil
   end
@@ -45,37 +58,41 @@ module Sigdump
   end
 
   def self.dump_object_count(io)
-    io.write "  Built-in objects:\n"
-    ObjectSpace.count_objects.sort_by {|k,v| -v }.each {|k,v|
-      io.write "%10s: %s\n" % [_fn(v), k]
-    }
+    if defined?(ObjectSpace.count_objects)
+      # ObjectSpace doesn't work in JRuby
 
-    string_size = 0
-    array_size = 0
-    hash_size = 0
-    cmap = {}
-    ObjectSpace.each_object {|o|
-      c = o.class
-      cmap[c] = (cmap[c] || 0) + 1
-      if c == String
-        string_size += o.bytesize
-      elsif c == Array
-        array_size = o.size
-      elsif c == Hash
-        hash_size = o.size
-      end
-    }
+      io.write "  Built-in objects:\n"
+      ObjectSpace.count_objects.sort_by {|k,v| -v }.each {|k,v|
+        io.write "%10s: %s\n" % [_fn(v), k]
+      }
 
-    io.write "  All objects:\n"
-    cmap.sort_by {|k,v| -v }.each {|k,v|
-      io.write "%10s: %s\n" % [_fn(v), k]
-    }
+      string_size = 0
+      array_size = 0
+      hash_size = 0
+      cmap = {}
+      ObjectSpace.each_object {|o|
+        c = o.class
+        cmap[c] = (cmap[c] || 0) + 1
+        if c == String
+          string_size += o.bytesize
+        elsif c == Array
+          array_size = o.size
+        elsif c == Hash
+          hash_size = o.size
+        end
+      }
 
-    io.write "  String #{_fn(string_size)} bytes\n"
-    io.write "   Array #{_fn(array_size)} elements\n"
-    io.write "    Hash #{_fn(hash_size)} pairs\n"
+      io.write "  All objects:\n"
+      cmap.sort_by {|k,v| -v }.each {|k,v|
+        io.write "%10s: %s\n" % [_fn(v), k]
+      }
 
-    io.flush
+      io.write "  String #{_fn(string_size)} bytes\n"
+      io.write "   Array #{_fn(array_size)} elements\n"
+      io.write "    Hash #{_fn(hash_size)} pairs\n"
+
+      io.flush
+    end
     nil
   end
 
