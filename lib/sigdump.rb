@@ -49,9 +49,11 @@ module Sigdump
     end
 
     io.write "  Thread #{thread} status=#{status} priority=#{thread.priority}\n"
-    thread.backtrace.each {|bt|
-      io.write "      #{bt}\n"
-    }
+    if thread.backtrace
+      thread.backtrace.each {|bt|
+        io.write "      #{bt}\n"
+      }
+    end
 
     io.flush
     nil
