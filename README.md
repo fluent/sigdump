@@ -2,27 +2,30 @@
 
 In short: *SIGQUIT of Java VM for Ruby.*
 
-Server applications (like Rails app) cause performance problems, deadlock or memory swapping from time to time. But it's painful to reproduce such kind of problems. If we can get information from a running process without restarting it, it's really helpful.
+Server applications (like Rails apps) cause performance problems, deadlock or memory swapping from time to time. But it's difficult to reproduce such kind of problems. `sigdump` makes it possible to get information from a running process without restarting. Just sending `SIGCONT` signal will dump backtrace and memory profile to `/tmp/sigdump-<pid>.log` file.
 
-`sigdump` gem makes it possible. It installs a signal handler which dumps backtrace of running threads, number of allocated objects per class, and GC statistics.
+`sigdump` dumps following information (see also [Sample output](#sample-outout)):
 
-If GC profiler is enabled (`GC::Profiler.enable` is called), it also dumps GC profiler reports. If the runtime is JRuby, it dumpds Java stacktrace in addition to Ruby stacktrace.
+* Backtrace of all threads
+* Number of allocated objects per class
+* GC profiler reports if GC profiler is enabled (`GC::Profiler.enable` is called)
+* Stacktrace of Java threads for each Ruby threads if the runtime is JRuby
 
 ## Install
 
-Just install one gem `sigdump` and require `sigdump/setup`:
+Just install `sigdump` gem and add `require 'sigdump/setup'` line to your code. Or you can use Bundler as following:
 
 ```ruby
-gem 'sigdump', :require => 'sigdump/setup'
+# Gemfile
+gem 'sigdump', require: 'sigdump/setup'
 ```
 
-### Resque
+Note for [Resque](https://github.com/resque/resque):
 
-Because Resque traps `SIGCONT` and it conflicts with sigdump, you need to change the signal such as `SIGTSTP`.
-To change the signal, set name of a signal to `SIGDUMP_SIGNAL` environment variable.
+You need to change the default signal (`SIGCONT`) because Rescue traps `SIGCONT` and it conflicts with sigdump.
+To change the signal, set name of a signal to `SIGDUMP_SIGNAL` environment variable. For Rails, you can add following lines to `environment.rb` file:
 
 ```ruby
-# environment.rb:
 # setup sigdump: https://github.com/frsyuki/sigdump
 ENV['SIGDUMP_SIGNAL'] = 'TSTP'
 require 'sigdump/setup'
@@ -30,7 +33,7 @@ require 'sigdump/setup'
 
 ## Usage
 
-Send `SIGCONT` signal to dump backtrace and heap status to `/tmp/sigdump-<pid>.log` file:
+Send `SIGCONT` signal to the Ruby process. It dumps backtrace and memory profile to `/tmp/sigdump-<pid>.log` file.
 
 ```shell
 $ kill -CONT <pid>
