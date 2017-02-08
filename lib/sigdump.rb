@@ -66,30 +66,45 @@ module Sigdump
         io.write "%10s: %s\n" % [_fn(v), k]
       }
 
-      string_size = 0
-      array_size = 0
-      hash_size = 0
-      cmap = {}
-      ObjectSpace.each_object {|o|
-        c = o.class
-        cmap[c] = (cmap[c] || 0) + 1
-        if c == String
-          string_size += o.bytesize
-        elsif c == Array
-          array_size = o.size
-        elsif c == Hash
-          hash_size = o.size
-        end
-      }
+      begin
+        measure_start = Time.now
 
-      io.write "  All objects:\n"
-      cmap.sort_by {|k,v| -v }.each {|k,v|
-        io.write "%10s: %s\n" % [_fn(v), k]
-      }
+        string_size = 0
+        array_size = 0
+        hash_size = 0
+        cmap = {}
+        i = 0
+        ObjectSpace.each_object {|o|
+          i += 1
+          if i % 1000 == 0
+            if Time.now - measure_start > 180
+              raise "Measurement timed out (too many objects)"
+            end
+          end
 
-      io.write "  String #{_fn(string_size)} bytes\n"
-      io.write "   Array #{_fn(array_size)} elements\n"
-      io.write "    Hash #{_fn(hash_size)} pairs\n"
+          c = o.class
+          cmap[c] = (cmap[c] || 0) + 1
+          if c == String
+            string_size += o.bytesize
+          elsif c == Array
+            array_size = o.size
+          elsif c == Hash
+            hash_size = o.size
+          end
+        }
+
+        io.write "  All objects:\n"
+        cmap.sort_by {|k,v| -v }.each {|k,v|
+          io.write "%10s: %s\n" % [_fn(v), k]
+        }
+
+        io.write "  String #{_fn(string_size)} bytes\n"
+        io.write "   Array #{_fn(array_size)} elements\n"
+        io.write "    Hash #{_fn(hash_size)} pairs\n"
+
+      rescue => e
+        io.write "  All objects: #{e}\n"
+      end
 
       io.flush
     end
