@@ -1,5 +1,6 @@
 module Sigdump
   VERSION = "0.2.4"
+  FILE_PERMISSION = 0600
 
   def self.setup(signal=ENV['SIGDUMP_SIGNAL'] || 'SIGCONT', path=ENV['SIGDUMP_PATH'])
     Kernel.trap(signal) do
@@ -135,7 +136,7 @@ module Sigdump
     case path
     when nil, ""
       path = "/tmp/sigdump-#{Process.pid}.log"
-      File.open(path, "a", &block)
+      File.open(path, "a", FILE_PERMISSION, &block)
     when IO
       yield path
     when "-"
@@ -143,7 +144,7 @@ module Sigdump
     when "+"
       yield STDERR
     else
-      File.open(path, "a", &block)
+      File.open(path, "a", FILE_PERMISSION, &block)
     end
   end
   private_class_method :_open_dump_path
