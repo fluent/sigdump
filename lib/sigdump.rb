@@ -1,3 +1,6 @@
+require 'securerandom'
+require 'fileutils'
+
 module Sigdump
   VERSION = "0.2.4"
 
@@ -131,10 +134,20 @@ module Sigdump
   end
   private_class_method :_fn
 
+  def self._avoid_linked_path_if_needed(path)
+    if FileTest.symlink?(path) || File.stat(path).nlink > 1
+      File.join(File.dirname(path),
+                "#{File.basename(path, File.extname(path))}-#{SecureRandom.hex(10)}#{File.extname(path)}")
+
+    else
+      path
+    end
+  end
+
   def self._open_dump_path(path, &block)
     case path
     when nil, ""
-      path = "/tmp/sigdump-#{Process.pid}.log"
+      path = _avoid_linked_path_if_needed("/tmp/sigdump-#{Process.pid}.log")
       File.open(path, "a", &block)
     when IO
       yield path
@@ -143,7 +156,7 @@ module Sigdump
     when "+"
       yield STDERR
     else
-      File.open(path, "a", &block)
+      File.open(_avoid_linked_path_if_needed(path), "a", &block)
     end
   end
   private_class_method :_open_dump_path
