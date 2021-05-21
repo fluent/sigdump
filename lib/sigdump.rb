@@ -148,7 +148,7 @@ module Sigdump
     case path
     when nil, ""
       path = _avoid_linked_path_if_needed("/tmp/sigdump-#{Process.pid}.log")
-      File.open(path, "a", &block)
+      File.open(path, "a", 0644, &block)
     when IO
       yield path
     when "-"
@@ -156,7 +156,7 @@ module Sigdump
     when "+"
       yield STDERR
     else
-      File.open(_avoid_linked_path_if_needed(path), "a", &block)
+      File.open(_avoid_linked_path_if_needed(path), "a", 0644, &block)
     end
   end
   private_class_method :_open_dump_path
