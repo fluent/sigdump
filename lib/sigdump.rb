@@ -1,3 +1,9 @@
+begin
+  require 'objspace'
+rescue LoadError
+  # skip
+end
+
 module Sigdump
   VERSION = "0.2.4"
 
@@ -11,11 +17,12 @@ module Sigdump
   end
 
   def self.dump(path=ENV['SIGDUMP_PATH'])
+    p :dump
     _open_dump_path(path) do |io|
       io.write "Sigdump at #{Time.now} process #{Process.pid} (#{$0})\n"
       dump_all_thread_backtrace(io)
       dump_gc_stat(io)
-      dump_object_count(io)
+      dump_object_stat(io)
       dump_gc_profiler_result(io)
     end
   end
@@ -59,7 +66,7 @@ module Sigdump
     nil
   end
 
-  def self.dump_object_count(io)
+  def self.dump_object_stat(io)
     if defined?(ObjectSpace.count_objects)
       # ObjectSpace doesn't work in JRuby
 
@@ -71,10 +78,14 @@ module Sigdump
       string_size = 0
       array_size = 0
       hash_size = 0
-      cmap = {}
+      cmap = Hash.new{|h, k| h[k] = [0, 0]} # cnt, size
       ObjectSpace.each_object {|o|
         c = o.class
-        cmap[c] = (cmap[c] || 0) + 1
+        entry = cmap[c]
+        entry[0] += 1
+        # Note: memsize_of() is only a hint, not *correct* info.
+        entry[1] += ObjectSpace.memsize_of(o)
+
         if c == String
           string_size += o.bytesize
         elsif c == Array
@@ -85,8 +96,8 @@ module Sigdump
       }
 
       io.write "  All objects:\n"
-      cmap.sort_by {|k,v| -v }.each {|k,v|
-        io.write "%10s: %s\n" % [_fn(v), k]
+      cmap.sort_by {|k,(c,s)| -s}.each {|k,(c,s)|
+        io.write "%10s: %s (%s)\n" % [_fn(c), k, _fn(s)]
       }
 
       io.write "  String #{_fn(string_size)} bytes\n"
