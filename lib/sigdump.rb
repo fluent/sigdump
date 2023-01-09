@@ -21,7 +21,7 @@ module Sigdump
   end
 
   def self.dump_all_thread_backtrace(io)
-    use_java_bean = defined?(Thread.current.to_java.getNativeThread.getId)
+    use_java_bean = defined?(Thread.current.to_java(org.jruby.RubyThread).getNativeThread.getId)
     if use_java_bean
       begin
         bean = java.lang.management.ManagementFactory.getThreadMXBean
@@ -33,7 +33,7 @@ module Sigdump
     Thread.list.each do |thread|
       dump_backtrace(thread, io)
       if java_stacktrace_map
-        io.write "    In Java " + java_stacktrace_map[thread.to_java.getNativeThread.getId]
+        io.write "    In Java " + java_stacktrace_map[thread.to_java(org.jruby.RubyThread).getNativeThread.getId]
         io.flush
       end
     end
