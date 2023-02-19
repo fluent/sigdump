@@ -71,16 +71,16 @@ module Sigdump
       string_size = 0
       array_size = 0
       hash_size = 0
-      cmap = {}
+      cmap = Hash.new(0).compare_by_identity
       ObjectSpace.each_object {|o|
-        c = o.class
-        cmap[c] = (cmap[c] || 0) + 1
+        c = o.class rescue nil
+        cmap[c] += 1
         if c == String
           string_size += o.bytesize
         elsif c == Array
-          array_size = o.size
+          array_size += o.size
         elsif c == Hash
-          hash_size = o.size
+          hash_size += o.size
         end
       }
 
