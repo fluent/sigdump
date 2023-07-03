@@ -1,3 +1,8 @@
+2023-07-03 version 0.2.5:
+
+* Added nil guard for thread.backtrace (by @yui-knk)
+* Fixed wrong calculation for array_size and hash_size (by @fatkodima)
+* Improved dumping speed (by @fatkodima)
 
 2016-02-04 version 0.2.4:
 
