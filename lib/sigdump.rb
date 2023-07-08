@@ -48,7 +48,7 @@ module Sigdump
       status = "error"
     end
 
-    io.write "  Thread #{thread} status=#{status} priority=#{thread.priority}\n"
+    io.write "  Thread #{thread}#{thread.respond_to?(:name) && thread.name ? " name=#{thread.name}" : ""} status=#{status} priority=#{thread.priority}\n"
     if thread.backtrace
       thread.backtrace.each {|bt|
         io.write "      #{bt}\n"
